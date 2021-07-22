@@ -1,0 +1,485 @@
+" All system-wide defaults are set in $VIMRUNTIME/debian.vim (usually just
+" /usr/share/vim/vimcurrent/debian.vim) and sourced by the call to :runtime
+" you can find below.  If you wish to change any of those settings, you should
+" do it in this file (/etc/vim/vimrc), since debian.vim will be overwritten
+" everytime an upgrade of the vim packages is performed.  It is recommended to
+" make changes after sourcing debian.vim since it alters the value of the
+" 'compatible' option.
+" This line should not be removed as it ensures that various options are
+" properly set to work with the Vim-related packages available in Debian.
+runtime! debian.vim
+" Uncomment the next line to make Vim more Vi-compatible
+" NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
+" options, so any other options should be set AFTER setting 'compatible'.
+"set compatible
+" Vim5 and later versions support syntax highlighting. Uncommenting the
+" following enables syntax highlighting by default.
+if has("syntax")
+syntax on
+endif
+" If using a dark background within the editing area and syntax highlighting
+" turn on this option as well
+"set background=dark
+" Uncomment the following to have Vim jump to the last position when
+" reopening a file
+"if has("autocmd")
+"  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+"endif
+" Uncomment the following to have Vim load indentation rules and plugins
+" according to the detected filetype.
+"if has("autocmd")
+"  filetype plugin indent on
+"endif
+" The following are commented out as they cause vim to behave a lot
+" differently from regular Vi. They are highly recommended though.
+"set showcmd	" Show (partial) command in status line.
+"set showmatch	" Show matching brackets.
+"set ignorecase	" Do case insensitive matching
+"set smartcase	" Do smart case matching
+"set incsearch	" Incremental search
+"set autowrite	" Automatically save before commands like :next and :make
+"set hidden             " Hide buffers when they are abandoned
+"set mouse=a	" Enable mouse usage (all modes)
+"*******************************************************
+"	Personal configuration
+"*******************************************************
+set fileencodings=utf-8,gbk,ucs-bom,cp936
+set encoding=utf-8
+set nocompatible
+set number
+filetype on 
+filetype indent on
+filetype plugin on
+set history=1000 
+set background=dark 
+syntax on 
+
+set autoindent
+set ts=4
+set expandtab
+
+"set smartindent
+set showmatch
+set guioptions-=T
+set vb t_vb=
+set ruler
+set nohls
+:set cindent
+set tabstop=4
+set shiftwidth=4
+set incsearch
+set cursorline
+set nobackup
+set mouse=v
+set hlsearch 	"set high light search, cancel the high light is set nohlsearch
+:set  laststatus=2
+:set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CSCOPE settings for vim           
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" This file contains some boilerplate settings for vim's cscope interface,
+    " plus some keyboard mappings that I've found useful.
+    "
+    " USAGE: 
+    " -- vim 6:     Stick this file in your ~/.vim/plugin directory (or in a
+    "               'plugin' directory in some other directory that is in your
+    "               'runtimepath'.
+    "
+    " -- vim 5:     Stick this file somewhere and 'source cscope.vim' it from
+    "               your ~/.vimrc file (or cut and paste it into your .vimrc).
+    "
+    " NOTE: 
+    " These key maps use multiple keystrokes (2 or 3 keys).  If you find that vim
+    " keeps timing you out before you can complete them, try changing your timeout
+    " settings, as explained below.
+    "
+    " Happy cscoping,
+    "
+    " Jason Duell       jduell@alumni.princeton.edu     2002/3/7
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    " This tests to see if vim was configured with the '--enable-cscope' option
+    " when it was compiled.  If it wasn't, time to recompile vim... 
+    if has("cscope")
+    """"""""""""" Standard cscope/vim boilerplate
+    " use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
+    set cscopetag
+    " check cscope for definition of a symbol before checking ctags: set to 1
+    " if you want the reverse search order.
+    set csto=0
+    " add any cscope database in current directory
+    if filereadable("cscope.out")
+    cs add cscope.out  
+    " else add the database pointed to by environment variable 
+    elseif $CSCOPE_DB != ""
+    cs add $CSCOPE_DB
+    endif
+    " show msg when any other cscope db added
+    set cscopeverbose  
+    """"""""""""" My cscope/vim key mappings
+    "
+    " The following maps all invoke one of the following cscope search types:
+    "
+    "   's'   symbol: find all references to the token under cursor
+    "   'g'   global: find global definition(s) of the token under cursor
+    "   'c'   calls:  find all calls to the function name under cursor
+    "   't'   text:   find all instances of the text under cursor
+    "   'e'   egrep:  egrep search for the word under cursor
+    "   'f'   file:   open the filename under cursor
+    "   'i'   includes: find files that include the filename under cursor
+    "   'd'   called: find functions that function under cursor calls
+    "
+    " Below are three sets of the maps: one set that just jumps to your
+    " search result, one that splits the existing vim window horizontally and
+    " diplays your search result in the new window, and one that does the same
+    " thing, but does a vertical split instead (vim 6 only).
+    "
+    " I've used CTRL-\ and CTRL-@ as the starting keys for these maps, as it's
+    " unlikely that you need their default mappings (CTRL-\'s default use is
+    " as part of CTRL-\ CTRL-N typemap, which basically just does the same
+    " thing as hitting 'escape': CTRL-@ doesn't seem to have any default use).
+    " If you don't like using 'CTRL-@' or CTRL-\, , you can change some or all
+    " of these maps to use other keys.  One likely candidate is 'CTRL-_'
+    " (which also maps to CTRL-/, which is easier to type).  By default it is
+    " used to switch between Hebrew and English keyboard mode.
+    "
+    " All of the maps involving the <cfile> macro use '^<cfile>$': this is so
+    " that searches over '#include <time.h>" return only references to
+    " 'time.h', and not 'sys/time.h', etc. (by default cscope will return all
+    " files that contain 'time.h' as part of their name).
+    " To do the first type of search, hit 'CTRL-\', followed by one of the
+    " cscope search types above (s,g,c,t,e,f,i,d).  The result of your cscope
+    " search will be displayed in the current window.  You can use CTRL-T to
+    " go back to where you were before the search.  
+    "
+    nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR> 
+    nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+    nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR> 
+    " Using 'CTRL-spacebar' (intepreted as CTRL-@ by vim) then a search type
+    " makes the vim window split horizontally, with search result displayed in
+    " the new window.
+    "
+    " (Note: earlier versions of vim may not have the :scs command, but it
+    " can be simulated roughly via:
+    "    nmap <C-@>s <C-W><C-S> :cs find s <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-@>s :scs find s <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-@>g :scs find g <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-@>c :scs find c <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-@>t :scs find t <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-@>e :scs find e <C-R>=expand("<cword>")<CR><CR> 
+    nmap <C-@>f :scs find f <C-R>=expand("<cfile>")<CR><CR> 
+    nmap <C-@>i :scs find i ^<C-R>=expand("<cfile>")<CR>$<CR> 
+    nmap <C-@>d :scs find d <C-R>=expand("<cword>")<CR><CR> 
+    " Hitting CTRL-space *twice* before the search type does a vertical 
+    " split instead of a horizontal one (vim 6 and up only)
+    "
+    " (Note: you may wish to put a 'set splitright' in your .vimrc
+    " if you prefer the new window on the right instead of the left
+    nmap <C-@><C-@>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@><C-@>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@><C-@>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@><C-@>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@><C-@>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
+    nmap <C-@><C-@>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR> 
+    nmap <C-@><C-@>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR> 
+    nmap <C-@><C-@>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
+    """"""""""""" key map timeouts
+    "
+    " By default Vim will only wait 1 second for each keystroke in a mapping.
+    " You may find that too short with the above typemaps.  If so, you should
+    " either turn off mapping timeouts via 'notimeout'.
+    "
+    "set notimeout 
+    "
+    " Or, you can keep timeouts, by uncommenting the timeoutlen line below,
+    " with your own personal favorite value (in milliseconds):
+    "
+    "set timeoutlen=4000
+    "
+    " Either way, since mapping timeout settings by default also set the
+    " timeouts for multicharacter 'keys codes' (like <F1>), you should also
+    " set ttimeout and ttimeoutlen: otherwise, you will experience strange
+    " delays as vim waits for a keystroke after you hit ESC (it will be
+    " waiting to see if the ESC is actually part of a key code like <F1>).
+    "
+    "set ttimeout 
+    "
+    " personally, I find a tenth of a second to work well for key code
+    " timeouts. If you experience problems and have a slow terminal or network
+    " connection, set it higher.  If you don't set ttimeoutlen, the value for
+    " timeoutlent (default: 1000 = 1 second, which is sluggish) is used.
+    "
+    "set ttimeoutlen=100
+    endif
+    " Title:        Verilog HDL/SystemVerilog HDVL indent file
+    " Maintainer: Mingzhi Li <limingzhi05@mail.nankai.edu.cn>
+    " Last Change: 2007-12-16 20:10:57 CST
+    "
+    " Buffer Variables:
+    "     b:verilog_indent_width   : indenting width(default value: shiftwidth)
+    "
+    " Install:
+    "     Drop it to ~/.vim/indent 
+    "
+    " URL:
+    "    http://www.vim.org/scripts/script.php?script_id=2091
+    "
+    " Revision Comments:
+    "     Mingzhi Li  2007-12-16 20:09:39 CST Version 1.2      
+    "        Bug fixes
+    "     Mingzhi Li  2007-12-13 23:47:54 CST Version 1.1      
+    "        Bug fix, improve performance and add introductions
+    "     Mingzhi Li  2007-12-7  22:16:41 CST Version 1.0  
+    "        Initial version
+    "       
+    " Known Limited:
+    "     This indent file can not work well, when you break the long line into
+    "     multi-line manually, such as:
+    "      always @(posedge a or posedge b 
+    "          or posedge c ) begin
+    "         //...
+    "      end 
+    "     Recommend to use the coding style(wraped by vim automatically) as following:
+    "       always @(posedge a or posedge b or posedge c ) begin
+    "         //...
+    "       end 
+    " Only load this indent file when no other was loaded.
+    if exists("b:did_indent")
+    finish
+    endif
+    let b:did_indent = 1
+setlocal indentexpr=GetVerilog_SystemVerilogIndent()
+    setlocal indentkeys=!^F,o,O,0),0},0{,=begin,=end,=fork,=join,=endcase,=join_any,=join_none
+	setlocal indentkeys+==endmodule,=endfunction,=endtask,=endspecify
+	    setlocal indentkeys+==endclass,=endpackage,=endsequence,=endclocking
+	    setlocal indentkeys+==endinterface,=endgroup,=endprogram,=endproperty
+	    setlocal indentkeys+==`else,=`endif
+	    " Only define the function once.
+	    if exists("*GetVerilog_SystemVerilogIndent")
+		finish
+		    endif
+		    set cpo-=C
+		    function s:comment_ind(lnum)
+		    let line = getline(a:lnum)
+		    if line =~ '^\s*\/\/'
+			return -1
+			    endif
+			    let firstPos = match(line,'\S') + 1
+			    if firstPos == 0
+				return -1
+				    endif
+				    let endPos   = match(line,'\s*$') 
+				    let flag1 = 0
+				    let flag2 = 0
+				    if (synIDattr(synID(a:lnum, firstPos, 1), "name") =~? '\(Comment\|String\)$')
+					let flag1 = 1
+					    endif
+					    if (synIDattr(synID(a:lnum, endPos, 1), "name") =~? '\(Comment\|String\)$' )
+						let flag2 = 1
+						    endif
+						    if ((1 == flag1)&&(1 == flag2))
+							let firstPos = match(line,'\*\/') + 2
+							    if (synIDattr(synID(a:lnum, firstPos, 1), "name") =~? '\(Comment\|String\)$')
+								return -1
+							    else
+								return 3
+								    endif
+								    endif
+								    if (1 == flag1)
+									return 1
+									    endif
+									    if (1 == flag2)
+										return 0
+										    endif
+										    return 2
+										    endfunction
+										    function s:prevnonblanknoncomment(lnum)
+										    let lnum = prevnonblank(a:lnum)
+										    while lnum > 0
+											if (-1 != s:comment_ind(lnum))
+											    break
+												endif
+												let lnum = prevnonblank(lnum - 1)
+												endwhile
+												return lnum
+												endfunction
+												function s:removecommment(line,comment_ind)
+												if (a:comment_ind ==  2)
+												    return a:line
+													endif
+													if (a:comment_ind == -1)
+													    return ""
+														endif
+														if (a:comment_ind == 1)
+														    return substitute(a:line,'^.\{-}\*\/',"","")
+														    endif
+														    let myline01 = a:line;
+
+if (a:comment_ind == 3)
+    let myline01 = substitute(myline01,'^.\{-}\*\/',"","")
+    endif
+    let myline01 = substitute(myline01,'\/\*.*$',"","")
+    return substitute(myline01,'\/\/.*$',"","")
+    endfunction
+function GetVerilog_SystemVerilogIndent()
+    if exists('b:verilog_indent_width')
+    let offset = b:verilog_indent_width
+    else
+    let offset = &sw
+    endif
+    " Find a non-blank and valid line above the current line.
+let lnum = s:prevnonblanknoncomment(v:lnum - 1)
+    " At the start of the file use zero indent.
+    if lnum == 0
+    return 0
+    endif
+    let ind  = indent(lnum)
+let curr_line_ind = s:comment_ind(v:lnum)
+    "if curr_line_ind == -1
+    "  return ind
+    "endif
+let curr_line  = s:removecommment(getline(v:lnum),curr_line_ind)
+    let curr_line2 = substitute(curr_line,'^\s*','','')
+    let match_result = matchstr(curr_line2,'^\<\(end\|else\|end\(case\|task\|function\|clocking\|interface\|module\|class\|specify\|package\|sequence\|group\|property\)\|join\|join_any\|join_none\)\>\|^}\|`endif\|`else')
+    if len(match_result) > 0
+    if match_result =~ '\<end\>'
+    let match_start = '\<begin\>'
+    let match_mid   = ''
+    let match_end   = '\<end\>'
+    elseif match_result =~ '\<else\>'
+    let last_line_ind = s:comment_ind(lnum)
+let last_line  = s:removecommment(getline(lnum),last_line_ind)
+    if last_line =~ '^\s*end\|^\s*}'
+return indent(lnum)
+    else
+    let match_start = '\<if\>'
+    let match_mid   = ''
+    let match_end   = '\<else\>'
+    endif
+    elseif match_result =~ 'join'
+    let match_start = '\<fork\>'
+    let match_mid   = ''
+    let match_end   = '\<\(join\|join_none\|join_any\)\>'
+    elseif match_result =~ '}'
+    let match_start = '{'
+    let match_mid   = ''
+    let match_end   = '}'
+    elseif match_result =~ '`else'
+    let match_start = '`if'
+    let match_mid   = ''
+    let match_end   = '`else'
+    elseif match_result =~ '`endif'
+    let match_start = '`if'
+    let match_mid   = '`else'
+    let match_end   = '`endif'
+    else
+    let match_start = substitute(match_result,'^end','','')
+    let match_start = '\<' . match_start . '\>'
+    let match_mid   = ''
+    let match_end   = '\<' . match_result. '\>'
+    endif
+call cursor(v:lnum,1)
+    let match_line = searchpair(match_start,match_mid,match_end,'bW',
+	    \" synIDattr(synID(line('.'),col('.'),1),'name')"
+	    \. "=~? '\\(Comment\\|String\\)$'")
+    if match_line > 0
+return indent(match_line)
+    endif
+    endif
+    let last_line_ind = s:comment_ind(lnum)
+let last_line  = s:removecommment(getline(lnum),last_line_ind)
+
+    let indent0 = 0
+    let indent1 = 0
+    let indent2 = 0
+    let de_indent0 = 0
+    let pat0 = '[{(]\s*$'
+	    let pat1 = '\<\(begin\|fork\)\>\s*\(:\s*\w\+\s*\)\=\s*$'
+	    let pat2 = '`\@<!\<\(if\|else\)\>'
+	    let pat3 = '\<\(always\|initial\|for\|foreach\|always_comb\|always_ff\|always_latch\|final\|repeat\|while\|constraint\|do\)\>'
+	    let pat5 = '\<\(case\%[[zx]]\|task\|function\|class\|interface\|clocking\|randcase\|package\|specify\)\>'
+	    let pat6 = '^\s*\(\w\+\s*:\)\=\s*\<covergroup\>'
+	    let pat7 = '^\s*\<\(begin\|fork\)\>\s*\(:\s*\w\+\s*\)\='
+	    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+	    if last_line =~ pat0 || last_line =~ pat1
+	    let indent0 = 1
+	    endif
+	    " Indent after if/else/for/case/always/initial/specify/fork blocks
+	    if (last_line =~ pat2 ||  last_line =~ pat3 || last_line =~ ':\s*$') && (last_line !~ ';\s*$')
+	    let indent1 = 1
+	    elseif  last_line =~ pat5 || last_line =~ pat6
+	    let indent2 = 1
+	    elseif last_line =~ '^\s*`\<\(ifdef\|else\|ifndef\)\>'
+	    return ind + offset
+	    endif
+	    let sum1 = indent0 + indent1 + indent2
+	    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+	    if (curr_line =~ pat7 || curr_line =~ '^\s*{')
+		let de_indent0 = 1
+		    endif
+		    if (sum1 == 0) && (last_line !~ '^\s*end\|\<begin\>') &&
+			\ (curr_line =~ ')\s*;\s*$') && 
+			    \ (last_line =~ ',\s*$' || last_line =~ '\w\s*$\|]\s*$\|)\s*$')
+			    return ind - offset
+			    endif
+			    let sum2 = de_indent0 
+			    if indent0 + indent1 + sum2 == 0
+				let lnum2 = s:prevnonblanknoncomment(lnum - 1)
+				    let last_line2_ind = s:comment_ind(lnum2)
+				    let last_line2 = s:removecommment(getline(lnum2),last_line2_ind)
+				    if ((last_line2 !~ pat0 && last_line2 !~ pat1) && 
+					    \ (last_line2 =~ pat2 || last_line2 =~ pat3 || last_line2 =~ ':\s*$') &&
+					    \ (last_line =~ ';\s*$'))
+					return indent(lnum2)
+					    endif
+					    endif
+
+					    " Return the indention
+					    if (indent0 == 0 && indent1 == 1 && de_indent0 == 1)
+						return ind
+						    elseif  sum1 > 0
+						    return ind + offset
+						    elseif  sum2 > 0
+						    return ind - offset
+					    else
+						return ind
+						    endif 
+						    endfunction
+						    " vim:sw=2
+						    "***********************Verilg & SystemVerilog Configure Ends*******************
+						    "********************************************************************************
+						    "	Mark Sets
+						    "********************************************************************************
+						    let mapleader = "."
+						    "***********************Mark Sets End*******************************************
+						    "********************************************************************************
+						    "	Personal configuration is End
+						    "********************************************************************************
+						    " Source a global configuration file if available
+						    if filereadable("/etc/vim/vimrc.local")
+							source /etc/vim/vimrc.local
+							    endif
+map <F8> :tfirst<CR>
+map <F1> :tprevious<CR>
+map <F2> :tnext<CR>
+map <F3> :NERDTreeToggle<CR>
+map <F3> :NERDTreeToggle<CR>
+nnoremap <silent> <F4> :TlistToggle<CR>
+map <C-F12> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+
+let NERDTreeShowBookmarks=1
+let Tlist_Use_Right_Window=1
+let Tlist_GainFocus_On_ToggleOpen=1
+
+" cppSyntaxCheck
+let g:include_path=":../include:./include:./tinyxml"
+let g:compile_flag="-D_LINUX_"
+let g:cpp_compiler="/usr/local/bin/g++"
+let g:enable_warning=1
+let g:cpp_compiler="LANG=C g++ -Wall"
+
